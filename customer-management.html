@@ -220,6 +220,28 @@
             gap: 10px;
             margin-bottom: 20px;
         }
+
+        .kana-btn {
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            min-width: 50px;
+        }
+
+        .kana-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .kana-btn.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
     </style>
 </head>
 <body>
@@ -227,23 +249,12 @@
         <h1>🏠 顧客管理アプリ</h1>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('home')">ホーム</button>
-            <button class="tab" onclick="switchTab('register')">新規顧客登録</button>
-            <button class="tab" onclick="switchTab('all')">全顧客一覧</button>
-        </div>
-
-        <!-- ホーム画面 -->
-        <div id="home" class="tab-content active">
-            <h2>👥 全顧客</h2>
-            <div id="allCustomersHome" class="customer-list"></div>
-
-            <div class="button-group" style="margin-top: 30px;">
-                <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
-            </div>
+            <button class="tab active" onclick="switchTab('register')">新規顧客登録</button>
+            <button class="tab" onclick="switchTab('list')">顧客一覧</button>
         </div>
 
         <!-- 新規顧客登録 -->
-        <div id="register" class="tab-content">
+        <div id="register" class="tab-content active">
             <h2>新規顧客登録</h2>
             <form id="customerForm" onsubmit="registerCustomer(event)">
                 <div class="form-group">
@@ -333,12 +344,40 @@
             </form>
         </div>
 
-        <!-- 全顧客一覧 -->
-        <div id="all" class="tab-content">
-            <h2>全顧客一覧</h2>
+        <!-- 顧客一覧 -->
+        <div id="list" class="tab-content">
+            <h2>顧客一覧</h2>
+            
             <div class="button-group">
                 <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
             </div>
+
+            <!-- 検索ボックス -->
+            <div class="form-group">
+                <label>🔍 検索 (名前または住所)</label>
+                <input type="text" id="searchBox" placeholder="名前や住所を入力..." oninput="filterCustomers()">
+            </div>
+
+            <!-- 50音フィルター -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold;">📋 50音で絞り込み</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <button onclick="filterByKana('all')" class="kana-btn active" id="kana-all">全て</button>
+                    <button onclick="filterByKana('ア')" class="kana-btn" id="kana-ア">ア</button>
+                    <button onclick="filterByKana('カ')" class="kana-btn" id="kana-カ">カ</button>
+                    <button onclick="filterByKana('サ')" class="kana-btn" id="kana-サ">サ</button>
+                    <button onclick="filterByKana('タ')" class="kana-btn" id="kana-タ">タ</button>
+                    <button onclick="filterByKana('ナ')" class="kana-btn" id="kana-ナ">ナ</button>
+                    <button onclick="filterByKana('ハ')" class="kana-btn" id="kana-ハ">ハ</button>
+                    <button onclick="filterByKana('マ')" class="kana-btn" id="kana-マ">マ</button>
+                    <button onclick="filterByKana('ヤ')" class="kana-btn" id="kana-ヤ">ヤ</button>
+                    <button onclick="filterByKana('ラ')" class="kana-btn" id="kana-ラ">ラ</button>
+                    <button onclick="filterByKana('ワ')" class="kana-btn" id="kana-ワ">ワ</button>
+                    <button onclick="filterByKana('その他')" class="kana-btn" id="kana-その他">その他</button>
+                </div>
+            </div>
+
+            <div id="customerCount" style="margin-bottom: 10px; color: #666; font-size: 14px;"></div>
             <div id="allCustomersList" class="customer-list"></div>
         </div>
     </div>
@@ -516,8 +555,8 @@
             document.getElementById('visitTime').value = `${hours}:${minutes}`;
             document.getElementById('nextVisitDate').value = getDateAfter7Days();
             
-            // ホーム画面に切り替え
-            switchTab('home');
+            // 顧客一覧タブに切り替え
+            switchTab('list');
             displayCustomers();
         }
 
@@ -561,23 +600,19 @@
         }
 
         // 顧客表示
-        function displayCustomers() {
-            const customers = getCustomers();
+        function displayCustomers(filteredCustomers = null) {
+            const customers = filteredCustomers !== null ? filteredCustomers : getCustomers();
             
-            // 全顧客（ホーム画面）
-            const allCustomersHomeContainer = document.getElementById('allCustomersHome');
-            if (customers.length === 0) {
-                allCustomersHomeContainer.innerHTML = '<div class="empty-state">登録されている顧客はいません</div>';
-            } else {
-                allCustomersHomeContainer.innerHTML = customers.map(createCustomerCard).join('');
-            }
-            
-            // 全顧客一覧タブ
+            // 顧客一覧タブ
             const allCustomersListContainer = document.getElementById('allCustomersList');
+            const customerCountDiv = document.getElementById('customerCount');
+            
             if (customers.length === 0) {
-                allCustomersListContainer.innerHTML = '<div class="empty-state">登録されている顧客はいません</div>';
+                allCustomersListContainer.innerHTML = '<div class="empty-state">表示する顧客がいません</div>';
+                if (customerCountDiv) customerCountDiv.textContent = '';
             } else {
                 allCustomersListContainer.innerHTML = customers.map(createCustomerCard).join('');
+                if (customerCountDiv) customerCountDiv.textContent = `${customers.length}件の顧客`;
             }
         }
 
@@ -622,6 +657,72 @@
             saveCustomers(customers);
             displayCustomers();
             alert('顧客を削除しました');
+        }
+
+        // 50音フィルター
+        let currentKanaFilter = 'all';
+        let currentSearchText = '';
+
+        function filterByKana(kana) {
+            currentKanaFilter = kana;
+            
+            // ボタンのアクティブ状態を更新
+            document.querySelectorAll('.kana-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`kana-${kana}`).classList.add('active');
+            
+            applyFilters();
+        }
+
+        // 名前の最初の文字から50音の行を判定
+        function getKanaGroup(name) {
+            if (!name || name === '(未入力)') return 'その他';
+            
+            const firstChar = name.charAt(0);
+            const kanaMap = {
+                'ア': 'あいうえおアイウエオ',
+                'カ': 'かきくけこがぎぐげごカキクケコガギグゲゴ',
+                'サ': 'さしすせそざじずぜぞサシスセソザジズゼゾ',
+                'タ': 'たちつてとだぢづでどタチツテトダヂヅデド',
+                'ナ': 'なにぬねのナニヌネノ',
+                'ハ': 'はひふへほばびぶべぼぱぴぷぺぽハヒフヘホバビブベボパピプペポ',
+                'マ': 'まみむめもマミムメモ',
+                'ヤ': 'やゆよヤユヨ',
+                'ラ': 'らりるれろラリルレロ',
+                'ワ': 'わをんワヲン'
+            };
+            
+            for (const [group, chars] of Object.entries(kanaMap)) {
+                if (chars.includes(firstChar)) return group;
+            }
+            
+            return 'その他';
+        }
+
+        // 検索フィルター
+        function filterCustomers() {
+            currentSearchText = document.getElementById('searchBox').value.toLowerCase();
+            applyFilters();
+        }
+
+        // フィルターを適用
+        function applyFilters() {
+            let customers = getCustomers();
+            
+            // 50音フィルター
+            if (currentKanaFilter !== 'all') {
+                customers = customers.filter(c => getKanaGroup(c.name) === currentKanaFilter);
+            }
+            
+            // 検索フィルター
+            if (currentSearchText) {
+                customers = customers.filter(c => {
+                    const name = (c.name || '').toLowerCase();
+                    const address = (c.address || '').toLowerCase();
+                    return name.includes(currentSearchText) || address.includes(currentSearchText);
+                });
+            }
+            
+            displayCustomers(customers);
         }
 
         // Excel出力
