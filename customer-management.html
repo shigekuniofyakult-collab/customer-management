@@ -251,6 +251,7 @@
         <div class="tabs">
             <button class="tab active" onclick="switchTab('register')">新規顧客登録</button>
             <button class="tab" onclick="switchTab('list')">顧客一覧</button>
+            <button class="tab" id="detailTab" style="display: none;" onclick="switchTab('detail')">顧客詳細</button>
         </div>
 
         <!-- 新規顧客登録 -->
@@ -347,10 +348,6 @@
         <!-- 顧客一覧 -->
         <div id="list" class="tab-content">
             <h2>顧客一覧</h2>
-            
-            <div class="button-group">
-                <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
-            </div>
 
             <!-- 検索ボックス -->
             <div class="form-group">
@@ -379,6 +376,115 @@
 
             <div id="customerCount" style="margin-bottom: 10px; color: #666; font-size: 14px;"></div>
             <div id="allCustomersList" class="customer-list"></div>
+            
+            <div class="button-group" style="margin-top: 30px;">
+                <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
+            </div>
+        </div>
+
+        <!-- 顧客詳細 -->
+        <div id="detail" class="tab-content">
+            <div style="margin-bottom: 20px;">
+                <button onclick="backToList()" style="background-color: #757575;">← 顧客一覧に戻る</button>
+            </div>
+            
+            <h2>顧客詳細</h2>
+            <form id="customerDetailForm" onsubmit="updateCustomer(event)">
+                <input type="hidden" id="detailCustomerId">
+                
+                <div class="form-group">
+                    <label>顧客名</label>
+                    <input type="text" id="detailCustomerName" placeholder="例: 田中様、〇〇マンション3階の方">
+                </div>
+
+                <div class="form-group">
+                    <label>対面者</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;" id="detailContactCheckboxes">
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailContact" value="奥"> 奥
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailContact" value="夫"> 夫
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailContact" value="おば"> おば
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailContact" value="おじ"> おじ
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailContact" value="子"> 子
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>住所</label>
+                    <input type="text" id="detailCustomerAddress" placeholder="例: 〇〇町1-2-3">
+                </div>
+
+                <div class="form-group">
+                    <label>ニーズ</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;" id="detailNeedsCheckboxes">
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailNeeds" value="便秘"> 便秘
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailNeeds" value="下痢"> 下痢
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailNeeds" value="睡眠"> 睡眠
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailNeeds" value="ストレス"> ストレス
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailNeeds" value="アレルギー"> アレルギー
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailNeeds" value="その他" id="detailNeedsOtherCheckbox" onchange="toggleDetailOtherNeeds()"> その他
+                        </label>
+                    </div>
+                    <input type="text" id="detailNeedsOtherText" placeholder="その他のニーズを入力" style="margin-top: 10px; display: none;">
+                </div>
+
+                <div class="form-group">
+                    <label>次回訪問予定日</label>
+                    <input type="date" id="detailNextVisitDate" style="margin-bottom: 10px;">
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" onclick="changeDetailNextVisitDate(-1)" style="flex: 1;">前の日</button>
+                        <button type="button" onclick="changeDetailNextVisitDate(1)" style="flex: 1;">次の日</button>
+                        <button type="button" onclick="clearDetailNextVisitDate()" style="flex: 1;">未設定</button>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">訪問履歴</h3>
+                <div id="visitHistoryList" style="margin-bottom: 20px;"></div>
+
+                <h3 style="margin-bottom: 15px;">新しい訪問記録を追加</h3>
+                
+                <div class="form-group">
+                    <label>訪問日時</label>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                        <input type="date" id="detailVisitDate" style="flex: 1;">
+                        <input type="time" id="detailVisitTime" style="flex: 1;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" onclick="changeDetailVisitDate(-1)" style="flex: 1;">前の日</button>
+                        <button type="button" onclick="changeDetailVisitDate(1)" style="flex: 1;">次の日</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>訪問メモ</label>
+                    <textarea id="detailVisitMemo" placeholder="例:&#10;眼鏡をかけた背の高いおじいちゃん&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" style="flex: 1;">保存して一覧に戻る</button>
+                    <button type="button" onclick="deleteCustomerFromDetail()" class="delete-btn" style="flex: 1;">顧客を削除</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -555,44 +661,17 @@
             document.getElementById('visitTime').value = `${hours}:${minutes}`;
             document.getElementById('nextVisitDate').value = getDateAfter7Days();
             
-            // 顧客一覧タブに切り替え
-            switchTab('list');
+            // 新規顧客登録画面のまま（遷移しない）
             displayCustomers();
         }
 
         // 顧客カードを生成
         function createCustomerCard(customer) {
-            const isUrgent = isThisWeek(customer.nextVisitDate);
-            const isTodayVisit = isToday(customer.nextVisitDate);
-            
-            let badge = '';
-            if (isTodayVisit) {
-                badge = '<span class="badge today">今日</span>';
-            } else if (isUrgent) {
-                badge = '<span class="badge this-week">今週</span>';
-            }
-            
-            const lastVisit = customer.visitHistory[customer.visitHistory.length - 1];
-            
-            let historyHtml = '';
-            if (customer.visitHistory.length > 0) {
-                historyHtml = '<div class="visit-history"><strong>訪問履歴:</strong>';
-                customer.visitHistory.forEach(visit => {
-                    historyHtml += `<div class="visit-history-item">📅 ${visit.date} - ${visit.memo || '(メモなし)'}</div>`;
-                });
-                historyHtml += '</div>';
-            }
-            
             return `
-                <div class="customer-card ${isUrgent ? 'urgent' : ''}">
-                    <h3>${customer.name} ${badge}</h3>
-                    <div class="customer-info">👤 対面者: ${customer.contact || '(未入力)'}</div>
-                    <div class="customer-info">🏠 ${customer.address}</div>
-                    <div class="customer-info">💡 ニーズ: ${customer.needs || '未記入'}</div>
-                    <div class="customer-info">📅 次回訪問予定: ${customer.nextVisitDate || '未設定'}</div>
-                    ${historyHtml}
+                <div class="customer-card">
+                    <h3>${customer.name}</h3>
                     <div class="customer-actions">
-                        <button class="secondary" onclick="addVisitRecord(${customer.id})">訪問記録を追加</button>
+                        <button class="secondary" onclick="showCustomerDetail(${customer.id})">情報確認・訪問記録を追加</button>
                         <button class="delete-btn" onclick="deleteCustomer(${customer.id})">削除</button>
                     </div>
                 </div>
@@ -601,7 +680,14 @@
 
         // 顧客表示
         function displayCustomers(filteredCustomers = null) {
-            const customers = filteredCustomers !== null ? filteredCustomers : getCustomers();
+            let customers = filteredCustomers !== null ? filteredCustomers : getCustomers();
+            
+            // 50音順にソート
+            customers.sort((a, b) => {
+                const nameA = a.name || '(未入力)';
+                const nameB = b.name || '(未入力)';
+                return nameA.localeCompare(nameB, 'ja');
+            });
             
             // 顧客一覧タブ
             const allCustomersListContainer = document.getElementById('allCustomersList');
@@ -616,8 +702,8 @@
             }
         }
 
-        // 訪問記録を追加
-        function addVisitRecord(customerId) {
+        // 顧客詳細を表示
+        function showCustomerDetail(customerId) {
             const customers = getCustomers();
             const customer = customers.find(c => c.id === customerId);
             
@@ -626,26 +712,167 @@
                 return;
             }
             
-            const visitDate = prompt('訪問日を入力してください (YYYY-MM-DD形式):', getTodayString());
-            if (!visitDate) return;
+            // 顧客情報をフォームに設定
+            document.getElementById('detailCustomerId').value = customer.id;
+            document.getElementById('detailCustomerName').value = customer.name === '(未入力)' ? '' : customer.name;
+            document.getElementById('detailCustomerAddress').value = customer.address === '(未入力)' ? '' : customer.address;
+            document.getElementById('detailNextVisitDate').value = customer.nextVisitDate || '';
             
-            const memo = prompt('訪問メモを入力してください:', '');
-            
-            const nextVisitDefault = getDateAfter7Days(new Date(visitDate));
-            const nextVisitDate = prompt('次回訪問予定日を入力してください (YYYY-MM-DD形式):', nextVisitDefault);
-            
-            customer.visitHistory.push({
-                date: visitDate,
-                memo: memo
+            // 対面者のチェックボックスを設定
+            document.querySelectorAll('input[name="detailContact"]').forEach(cb => {
+                cb.checked = customer.contact && customer.contact.includes(cb.value);
             });
             
-            if (nextVisitDate) {
-                customer.nextVisitDate = nextVisitDate;
+            // ニーズのチェックボックスを設定
+            document.querySelectorAll('input[name="detailNeeds"]').forEach(cb => cb.checked = false);
+            document.getElementById('detailNeedsOtherText').style.display = 'none';
+            document.getElementById('detailNeedsOtherText').value = '';
+            
+            if (customer.needs && customer.needs !== '(未入力)') {
+                const needsArray = customer.needs.split(', ');
+                needsArray.forEach(need => {
+                    if (need.startsWith('その他(')) {
+                        document.getElementById('detailNeedsOtherCheckbox').checked = true;
+                        document.getElementById('detailNeedsOtherText').style.display = 'block';
+                        const otherText = need.match(/その他\((.*)\)/);
+                        if (otherText) {
+                            document.getElementById('detailNeedsOtherText').value = otherText[1];
+                        }
+                    } else {
+                        const checkbox = Array.from(document.querySelectorAll('input[name="detailNeeds"]')).find(cb => cb.value === need);
+                        if (checkbox) checkbox.checked = true;
+                    }
+                });
+            }
+            
+            // 訪問履歴を表示
+            let historyHtml = '';
+            if (customer.visitHistory && customer.visitHistory.length > 0) {
+                customer.visitHistory.forEach((visit, index) => {
+                    historyHtml += `
+                        <div class="visit-history" style="margin-bottom: 10px;">
+                            <strong>訪問 ${index + 1}</strong>
+                            <div>📅 ${visit.date}</div>
+                            <div>📝 ${visit.memo || '(メモなし)'}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                historyHtml = '<div class="empty-state">訪問履歴がありません</div>';
+            }
+            document.getElementById('visitHistoryList').innerHTML = historyHtml;
+            
+            // 新しい訪問記録の初期値を設定
+            document.getElementById('detailVisitDate').valueAsDate = new Date();
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('detailVisitTime').value = `${hours}:${minutes}`;
+            document.getElementById('detailVisitMemo').value = '';
+            
+            // 詳細画面に切り替え
+            document.getElementById('detailTab').style.display = 'block';
+            switchTab('detail');
+        }
+
+        // 顧客一覧に戻る
+        function backToList() {
+            document.getElementById('detailTab').style.display = 'none';
+            switchTab('list');
+        }
+
+        // 顧客情報を更新
+        function updateCustomer(event) {
+            event.preventDefault();
+            
+            const customerId = parseInt(document.getElementById('detailCustomerId').value);
+            const customers = getCustomers();
+            const customer = customers.find(c => c.id === customerId);
+            
+            if (!customer) {
+                alert('顧客が見つかりません');
+                return;
+            }
+            
+            // 基本情報を更新
+            customer.name = document.getElementById('detailCustomerName').value || '(未入力)';
+            customer.address = document.getElementById('detailCustomerAddress').value || '(未入力)';
+            customer.nextVisitDate = document.getElementById('detailNextVisitDate').value;
+            
+            // 対面者を更新
+            const contactCheckboxes = document.querySelectorAll('input[name="detailContact"]:checked');
+            customer.contact = Array.from(contactCheckboxes).map(cb => cb.value).join(', ') || '(未入力)';
+            
+            // ニーズを更新
+            const needsCheckboxes = document.querySelectorAll('input[name="detailNeeds"]:checked');
+            const needsArray = Array.from(needsCheckboxes).map(cb => cb.value);
+            const otherNeedsText = document.getElementById('detailNeedsOtherText').value.trim();
+            if (document.getElementById('detailNeedsOtherCheckbox').checked && otherNeedsText) {
+                needsArray[needsArray.indexOf('その他')] = `その他(${otherNeedsText})`;
+            }
+            customer.needs = needsArray.join(', ') || '(未入力)';
+            
+            // 新しい訪問記録を追加（入力されている場合）
+            const visitDate = document.getElementById('detailVisitDate').value;
+            const visitTime = document.getElementById('detailVisitTime').value;
+            const visitMemo = document.getElementById('detailVisitMemo').value;
+            
+            if (visitMemo.trim()) {
+                const visitDateTime = visitTime ? `${visitDate} ${visitTime}` : visitDate;
+                customer.visitHistory.push({
+                    date: visitDateTime,
+                    memo: visitMemo
+                });
             }
             
             saveCustomers(customers);
+            alert('顧客情報を更新しました!');
+            backToList();
             displayCustomers();
-            alert('訪問記録を追加しました!');
+        }
+
+        // 詳細画面で次回訪問予定日を変更
+        function changeDetailNextVisitDate(days) {
+            const nextVisitDateInput = document.getElementById('detailNextVisitDate');
+            const currentDate = nextVisitDateInput.value ? new Date(nextVisitDateInput.value) : new Date();
+            currentDate.setDate(currentDate.getDate() + days);
+            nextVisitDateInput.value = currentDate.toISOString().split('T')[0];
+        }
+
+        // 詳細画面で次回訪問予定日をクリア
+        function clearDetailNextVisitDate() {
+            document.getElementById('detailNextVisitDate').value = '';
+        }
+
+        // 詳細画面で訪問日を変更
+        function changeDetailVisitDate(days) {
+            const visitDateInput = document.getElementById('detailVisitDate');
+            const currentDate = visitDateInput.value ? new Date(visitDateInput.value) : new Date();
+            currentDate.setDate(currentDate.getDate() + days);
+            visitDateInput.value = currentDate.toISOString().split('T')[0];
+        }
+
+        // 詳細画面でその他ニーズの入力欄表示切替
+        function toggleDetailOtherNeeds() {
+            const checkbox = document.getElementById('detailNeedsOtherCheckbox');
+            const textInput = document.getElementById('detailNeedsOtherText');
+            textInput.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) {
+                textInput.value = '';
+            }
+        }
+
+        // 詳細画面から顧客を削除
+        function deleteCustomerFromDetail() {
+            if (!confirm('本当にこの顧客を削除しますか?')) return;
+            
+            const customerId = parseInt(document.getElementById('detailCustomerId').value);
+            let customers = getCustomers();
+            customers = customers.filter(c => c.id !== customerId);
+            saveCustomers(customers);
+            alert('顧客を削除しました');
+            backToList();
+            displayCustomers();
         }
 
         // 顧客削除
