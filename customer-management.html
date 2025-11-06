@@ -349,7 +349,7 @@
 
                 <div class="form-group">
                     <label>訪問メモ</label>
-                    <textarea id="visitMemo" placeholder="例:&#10;眼鏡をかけた背の高いおじいちゃん&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
+                    <textarea id="visitMemo" placeholder="例： 見た目や雰囲気について&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
                 </div>
 
                 <button type="submit">登録する</button>
@@ -360,16 +360,30 @@
         <div id="list" class="tab-content">
             <h2>顧客一覧</h2>
 
+            <!-- バックアップリマインダー -->
+            <div id="backupReminder" style="display: none; background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 5px; padding: 15px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>⚠️ バックアップのお知らせ</strong>
+                        <p style="margin: 5px 0 0 0; color: #856404;">最後のバックアップから<span id="daysSinceBackup"></span>日経過しています。データを保存しませんか?</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="exportToExcel(); dismissBackupReminder();" style="background-color: #ffc107; color: #000;">今すぐ保存</button>
+                        <button onclick="dismissBackupReminder();" style="background-color: #6c757d;">後で</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- 検索ボックス -->
             <div class="form-group">
-                <label>🔍 検索 (名前または住所)</label>
-                <input type="text" id="searchBox" placeholder="名前や住所を入力..." oninput="filterCustomers()">
+                <label>🔍 検索 (名前・住所・メモ内容)</label>
+                <input type="text" id="searchBox" placeholder="名前、住所、訪問メモから検索..." oninput="filterCustomers()">
             </div>
 
             <!-- 50音フィルター -->
             <div style="margin-bottom: 20px;">
                 <label style="display: block; margin-bottom: 10px; font-weight: bold;">📋 50音で絞り込み</label>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
                     <button onclick="filterByKana('all')" class="kana-btn active" id="kana-all">全て</button>
                     <button onclick="filterByKana('ア')" class="kana-btn" id="kana-ア">ア</button>
                     <button onclick="filterByKana('カ')" class="kana-btn" id="kana-カ">カ</button>
@@ -382,6 +396,9 @@
                     <button onclick="filterByKana('ラ')" class="kana-btn" id="kana-ラ">ラ</button>
                     <button onclick="filterByKana('ワ')" class="kana-btn" id="kana-ワ">ワ</button>
                     <button onclick="filterByKana('その他')" class="kana-btn" id="kana-その他">その他</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="filterByVisitInterval()" class="kana-btn" id="kana-要フォロー" style="background-color: #ffebee; color: #f44336; border-color: #f44336;">🔴 要フォロー (15日以上)</button>
                 </div>
             </div>
 
@@ -478,14 +495,14 @@
 
                 <div class="form-group">
                     <label>訪問メモ</label>
-                    <textarea id="detailVisitMemo" placeholder="例:&#10;眼鏡をかけた背の高いおじいちゃん&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
+                    <textarea id="detailVisitMemo" placeholder="例： 見た目や雰囲気について&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
                 </div>
 
                 <button type="submit" style="width: 100%;">保存して一覧に戻る</button>
             </form>
 
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd;">
-                <button onclick="deleteCustomerFromDetail()" class="delete-btn" style="width: 100%;">この顧客を削除</button>
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center;">
+                <button onclick="deleteCustomerFromDetail()" class="delete-btn" style="width: auto; padding: 8px 20px; font-size: 14px;">この顧客を削除</button>
             </div>
         </div>
     </div>
@@ -549,6 +566,9 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             document.getElementById('visitTime').value = `${hours}:${minutes}`;
+            
+            // バックアップリマインダーをチェック
+            checkBackupReminder();
             
             // 表示を更新
             displayCustomers();
@@ -627,9 +647,31 @@
 
         // 顧客カードを生成
         function createCustomerCard(customer) {
+            // 最終訪問日からの経過日数を計算
+            let daysSinceLastVisit = null;
+            let visitIntervalBadge = '';
+            
+            if (customer.visitHistory && customer.visitHistory.length > 0) {
+                const lastVisit = customer.visitHistory[customer.visitHistory.length - 1];
+                const lastVisitDate = new Date(lastVisit.date.split(' ')[0]); // 日付部分のみ取得
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                lastVisitDate.setHours(0, 0, 0, 0);
+                
+                daysSinceLastVisit = Math.floor((today - lastVisitDate) / (1000 * 60 * 60 * 24));
+                
+                if (daysSinceLastVisit >= 15) {
+                    visitIntervalBadge = `<span style="color: #f44336; font-weight: bold; margin-left: 10px;">🔴 最終訪問: ${daysSinceLastVisit}日前 (要フォロー)</span>`;
+                } else if (daysSinceLastVisit >= 8) {
+                    visitIntervalBadge = `<span style="color: #ff9800; font-weight: bold; margin-left: 10px;">⚠️ 最終訪問: ${daysSinceLastVisit}日前</span>`;
+                } else {
+                    visitIntervalBadge = `<span style="color: #666; margin-left: 10px;">最終訪問: ${daysSinceLastVisit}日前</span>`;
+                }
+            }
+            
             return `
                 <div class="customer-card">
-                    <h3>${customer.name}</h3>
+                    <h3>${customer.name}${visitIntervalBadge}</h3>
                     <div class="customer-actions">
                         <button class="secondary" onclick="showCustomerDetail(${customer.id})">情報確認・訪問記録を追加</button>
                     </div>
@@ -709,7 +751,10 @@
                 customer.visitHistory.forEach((visit, index) => {
                     historyHtml += `
                         <div class="visit-history" style="margin-bottom: 10px;">
-                            <strong>訪問 ${index + 1}</strong>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong>訪問 ${index + 1}</strong>
+                                <button type="button" onclick="editVisitHistory(${customer.id}, ${index})" style="padding: 5px 15px; font-size: 13px;">編集</button>
+                            </div>
                             <div>📅 ${visit.date}</div>
                             <div>📝 ${visit.memo || '(メモなし)'}</div>
                         </div>
@@ -742,7 +787,7 @@
 
         // 顧客一覧に戻る
         function backToList() {
-            document.getElementById('detailTab').style.display = 'none';
+            // 詳細タブは表示したまま、一覧タブに切り替え
             switchTab('list');
         }
 
@@ -813,6 +858,34 @@
             }
         }
 
+        // 訪問履歴を編集
+        function editVisitHistory(customerId, visitIndex) {
+            const customers = getCustomers();
+            const customer = customers.find(c => c.id === customerId);
+            
+            if (!customer || !customer.visitHistory[visitIndex]) {
+                alert('訪問履歴が見つかりません');
+                return;
+            }
+            
+            const visit = customer.visitHistory[visitIndex];
+            const currentMemo = visit.memo || '';
+            
+            const newMemo = prompt(`訪問 ${visitIndex + 1} のメモを編集:\n\n日時: ${visit.date}`, currentMemo);
+            
+            // キャンセルした場合は何もしない
+            if (newMemo === null) return;
+            
+            // メモを更新
+            customer.visitHistory[visitIndex].memo = newMemo;
+            
+            saveCustomers(customers);
+            alert('訪問履歴を更新しました!');
+            
+            // 詳細画面を再表示
+            showCustomerDetail(customerId);
+        }
+
         // 詳細画面から顧客を削除
         function deleteCustomerFromDetail() {
             if (!confirm('本当にこの顧客を削除しますか?')) return;
@@ -880,19 +953,114 @@
                 customers = customers.filter(c => getKanaGroup(c.name) === currentKanaFilter);
             }
             
-            // 検索フィルター
+            // 検索フィルター（名前・住所・メモ内容）
             if (currentSearchText) {
                 customers = customers.filter(c => {
                     const name = (c.name || '').toLowerCase();
                     const address = (c.address || '').toLowerCase();
-                    return name.includes(currentSearchText) || address.includes(currentSearchText);
+                    
+                    // 訪問メモも検索対象に
+                    let allMemos = '';
+                    if (c.visitHistory && c.visitHistory.length > 0) {
+                        allMemos = c.visitHistory.map(v => (v.memo || '')).join(' ').toLowerCase();
+                    }
+                    
+                    return name.includes(currentSearchText) || 
+                           address.includes(currentSearchText) || 
+                           allMemos.includes(currentSearchText);
                 });
             }
             
             displayCustomers(customers);
         }
 
-        // Excel出力
+        // 訪問間隔でフィルター（15日以上訪問していない顧客）
+        function filterByVisitInterval() {
+            // ボタンのアクティブ状態を更新
+            document.querySelectorAll('.kana-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('kana-要フォロー').classList.add('active');
+            
+            currentKanaFilter = 'all'; // 50音フィルターはリセット
+            
+            let customers = getCustomers();
+            
+            // 15日以上訪問していない顧客を抽出
+            customers = customers.filter(c => {
+                if (!c.visitHistory || c.visitHistory.length === 0) {
+                    return false;
+                }
+                
+                const lastVisit = c.visitHistory[c.visitHistory.length - 1];
+                const lastVisitDate = new Date(lastVisit.date.split(' ')[0]);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                lastVisitDate.setHours(0, 0, 0, 0);
+                
+                const daysSinceLastVisit = Math.floor((today - lastVisitDate) / (1000 * 60 * 60 * 24));
+                
+                return daysSinceLastVisit >= 15;
+            });
+            
+            // 検索テキストも適用
+            if (currentSearchText) {
+                customers = customers.filter(c => {
+                    const name = (c.name || '').toLowerCase();
+                    const address = (c.address || '').toLowerCase();
+                    let allMemos = '';
+                    if (c.visitHistory && c.visitHistory.length > 0) {
+                        allMemos = c.visitHistory.map(v => (v.memo || '')).join(' ').toLowerCase();
+                    }
+                    return name.includes(currentSearchText) || 
+                           address.includes(currentSearchText) || 
+                           allMemos.includes(currentSearchText);
+                });
+            }
+            
+            displayCustomers(customers);
+        }
+
+        // バックアップ関連の定数とストレージキー
+        const LAST_BACKUP_KEY = 'lastBackupDate';
+        const BACKUP_REMINDER_DISMISSED_KEY = 'backupReminderDismissed';
+
+        // バックアップリマインダーをチェック
+        function checkBackupReminder() {
+            const lastBackup = localStorage.getItem(LAST_BACKUP_KEY);
+            const reminderDismissed = localStorage.getItem(BACKUP_REMINDER_DISMISSED_KEY);
+            
+            if (!lastBackup) {
+                // 初回起動時は表示しない
+                localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+                return;
+            }
+            
+            const lastBackupDate = new Date(lastBackup);
+            const today = new Date();
+            const daysSinceBackup = Math.floor((today - lastBackupDate) / (1000 * 60 * 60 * 24));
+            
+            // 7日以上経過していて、リマインダーを非表示にしていない場合
+            if (daysSinceBackup >= 7 && !reminderDismissed) {
+                const reminderDiv = document.getElementById('backupReminder');
+                const daysSpan = document.getElementById('daysSinceBackup');
+                if (reminderDiv && daysSpan) {
+                    daysSpan.textContent = daysSinceBackup;
+                    reminderDiv.style.display = 'block';
+                }
+            }
+        }
+
+        // リマインダーを非表示にする
+        function dismissBackupReminder() {
+            document.getElementById('backupReminder').style.display = 'none';
+            localStorage.setItem(BACKUP_REMINDER_DISMISSED_KEY, 'true');
+            
+            // 24時間後に再度表示できるようにする
+            setTimeout(() => {
+                localStorage.removeItem(BACKUP_REMINDER_DISMISSED_KEY);
+            }, 24 * 60 * 60 * 1000);
+        }
+
+        // バックアップ関連の定数とストレージキー
         function exportToExcel() {
             const customers = getCustomers();
             
@@ -931,6 +1099,16 @@
             
             // ファイルをダウンロード
             XLSX.writeFile(wb, filename);
+            
+            // バックアップ日時を更新
+            localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+            
+            // リマインダーを非表示
+            const reminderDiv = document.getElementById('backupReminder');
+            if (reminderDiv) {
+                reminderDiv.style.display = 'none';
+            }
+            localStorage.removeItem(BACKUP_REMINDER_DISMISSED_KEY);
         }
     </script>
 </body>
