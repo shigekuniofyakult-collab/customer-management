@@ -272,7 +272,7 @@
         <div class="tabs">
             <button class="tab active" onclick="switchTab('register')">新規顧客登録</button>
             <button class="tab" onclick="switchTab('list')">顧客一覧</button>
-            <button class="tab" id="detailTab" style="display: none;" onclick="switchTab('detail')">顧客詳細</button>
+            <button class="tab" id="detailTab" onclick="switchTab('detail')">顧客詳細</button>
         </div>
 
         <!-- 新規顧客登録 -->
@@ -407,6 +407,12 @@
             
             <div class="button-group" style="margin-top: 30px;">
                 <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
+            </div>
+
+            <!-- デバッグ用: 全データ削除ボタン -->
+            <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center;">
+                <p style="color: #999; font-size: 12px; margin-bottom: 10px;">⚠️ デバッグ用機能（本番では削除予定）</p>
+                <button onclick="deleteAllCustomers()" style="background-color: #d32f2f; padding: 8px 20px; font-size: 13px;">🗑️ 全顧客データを削除</button>
             </div>
         </div>
 
@@ -749,6 +755,9 @@
             let historyHtml = '';
             if (customer.visitHistory && customer.visitHistory.length > 0) {
                 customer.visitHistory.forEach((visit, index) => {
+                    // メモの改行を<br>タグに変換
+                    const memoWithBreaks = (visit.memo || '(メモなし)').replace(/\n/g, '<br>');
+                    
                     historyHtml += `
                         <div class="visit-history" style="margin-bottom: 10px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
@@ -756,7 +765,7 @@
                                 <button type="button" onclick="editVisitHistory(${customer.id}, ${index})" style="padding: 5px 15px; font-size: 13px;">編集</button>
                             </div>
                             <div>📅 ${visit.date}</div>
-                            <div>📝 ${visit.memo || '(メモなし)'}</div>
+                            <div>📝 ${memoWithBreaks}</div>
                         </div>
                     `;
                 });
@@ -774,8 +783,6 @@
             document.getElementById('detailVisitMemo').value = '';
             
             // 詳細画面に切り替え
-            document.getElementById('detailTab').style.display = 'block';
-            
             // タブのアクティブ状態を手動で設定
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById('detailTab').classList.add('active');
@@ -869,17 +876,66 @@
             }
             
             const visit = customer.visitHistory[visitIndex];
+            const currentDate = visit.date;
             const currentMemo = visit.memo || '';
             
-            const newMemo = prompt(`訪問 ${visitIndex + 1} のメモを編集:\n\n日時: ${visit.date}`, currentMemo);
+            // 編集用のダイアログを作成
+            const editDialog = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;" id="editDialog">
+                    <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%;">
+                        <h3 style="margin-top: 0;">訪問 ${visitIndex + 1} の編集</h3>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">訪問日時</label>
+                            <input type="text" id="editVisitDate" value="${currentDate}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                            <small style="color: #666;">形式: 2024-11-06 14:30 または 2024-11-06</small>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">メモ</label>
+                            <textarea id="editVisitMemo" style="width: 100%; min-height: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">${currentMemo}</textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="saveVisitHistoryEdit(${customerId}, ${visitIndex})" style="flex: 1;">保存</button>
+                            <button onclick="closeEditDialog()" style="flex: 1; background-color: #757575;">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            // キャンセルした場合は何もしない
-            if (newMemo === null) return;
+            document.body.insertAdjacentHTML('beforeend', editDialog);
+        }
+        
+        // 編集ダイアログを閉じる
+        function closeEditDialog() {
+            const dialog = document.getElementById('editDialog');
+            if (dialog) {
+                dialog.remove();
+            }
+        }
+        
+        // 訪問履歴の編集を保存
+        function saveVisitHistoryEdit(customerId, visitIndex) {
+            const newDate = document.getElementById('editVisitDate').value;
+            const newMemo = document.getElementById('editVisitMemo').value;
             
-            // メモを更新
+            if (!newDate.trim()) {
+                alert('訪問日時を入力してください');
+                return;
+            }
+            
+            const customers = getCustomers();
+            const customer = customers.find(c => c.id === customerId);
+            
+            if (!customer || !customer.visitHistory[visitIndex]) {
+                alert('訪問履歴が見つかりません');
+                return;
+            }
+            
+            // 更新
+            customer.visitHistory[visitIndex].date = newDate.trim();
             customer.visitHistory[visitIndex].memo = newMemo;
             
             saveCustomers(customers);
+            closeEditDialog();
             alert('訪問履歴を更新しました!');
             
             // 詳細画面を再表示
@@ -896,6 +952,32 @@
             saveCustomers(customers);
             alert('顧客を削除しました');
             backToList();
+            displayCustomers();
+        }
+
+        // 全顧客データを削除（デバッグ用・3回確認）
+        function deleteAllCustomers() {
+            if (!confirm('【警告】全ての顧客データを削除します。本当によろしいですか？\n\nこの操作は取り消せません。')) {
+                return;
+            }
+            
+            if (!confirm('【2回目の確認】本当に全データを削除しますか？\n\n削除すると復元できません。')) {
+                return;
+            }
+            
+            if (!confirm('【最終確認】これが最後の確認です。全顧客データを完全に削除しますか？')) {
+                return;
+            }
+            
+            // 全データを削除
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(ID_COUNTER_KEY);
+            localStorage.removeItem(LAST_BACKUP_KEY);
+            localStorage.removeItem(BACKUP_REMINDER_DISMISSED_KEY);
+            
+            alert('全ての顧客データを削除しました。');
+            
+            // 画面を更新
             displayCustomers();
         }
 
