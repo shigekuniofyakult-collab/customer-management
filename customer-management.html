@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顧客管理アプリ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Meiryo, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #555;
+            margin: 30px 0 15px 0;
+            font-size: 20px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background-color: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px 5px 0 0;
+            transition: background-color 0.3s;
+        }
+
+        .tab:hover {
+            background-color: #e0e0e0;
+        }
+
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.secondary {
+            background-color: #2196F3;
+        }
+
+        button.secondary:hover {
+            background-color: #0b7dda;
+        }
+
+        .customer-list {
+            margin-top: 20px;
+        }
+
+        .customer-card {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .customer-card.urgent {
+            border-left-color: #ff9800;
+            background-color: #fff3e0;
+        }
+
+        .customer-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .customer-info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .customer-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .customer-actions button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+        }
+
+        .delete-btn:hover {
+            background-color: #da190b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .visit-history {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .visit-history-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .visit-history-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge.today {
+            background-color: #ff5722;
+            color: white;
+        }
+
+        .badge.this-week {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 顧客管理アプリ</h1>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('home')">ホーム</button>
+            <button class="tab" onclick="switchTab('register')">新規顧客登録</button>
+            <button class="tab" onclick="switchTab('all')">全顧客一覧</button>
+        </div>
+
+        <!-- ホーム画面 -->
+        <div id="home" class="tab-content active">
+            <div class="button-group">
+                <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
+            </div>
+
+            <h2>📅 今週訪問予定の顧客</h2>
+            <div id="thisWeekCustomers" class="customer-list"></div>
+
+            <h2>👥 全顧客</h2>
+            <div id="allCustomersHome" class="customer-list"></div>
+        </div>
+
+        <!-- 新規顧客登録 -->
+        <div id="register" class="tab-content">
+            <h2>新規顧客登録</h2>
+            <form id="customerForm" onsubmit="registerCustomer(event)">
+                <div class="form-group">
+                    <label>顧客名 *</label>
+                    <input type="text" id="customerName" required placeholder="例: 田中様、〇〇マンション3階の方">
+                </div>
+
+                <div class="form-group">
+                    <label>住所 *</label>
+                    <input type="text" id="customerAddress" required placeholder="例: 〇〇町1-2-3">
+                </div>
+
+                <div class="form-group">
+                    <label>ニーズ</label>
+                    <input type="text" id="customerNeeds" placeholder="例: 便秘、下痢、睡眠">
+                </div>
+
+                <div class="form-group">
+                    <label>初回訪問日 *</label>
+                    <input type="date" id="visitDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>訪問メモ</label>
+                    <textarea id="visitMemo" placeholder="例: ヤクルト400を提案、興味あり"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>次回訪問予定日</label>
+                    <input type="date" id="nextVisitDate">
+                </div>
+
+                <button type="submit">登録する</button>
+            </form>
+        </div>
+
+        <!-- 全顧客一覧 -->
+        <div id="all" class="tab-content">
+            <h2>全顧客一覧</h2>
+            <div class="button-group">
+                <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
+            </div>
+            <div id="allCustomersList" class="customer-list"></div>
+        </div>
+    </div>
+
+    <!-- 訪問記録追加モーダル用のHTMLは後で動的生成 -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // ローカルストレージのキー
+        const STORAGE_KEY = 'customerData';
+        const ID_COUNTER_KEY = 'customerIdCounter';
+
+        // 顧客データを取得
+        function getCustomers() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        // 顧客データを保存
+        function saveCustomers(customers) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(customers));
+        }
+
+        // 新しいIDを生成
+        function getNextId() {
+            let counter = parseInt(localStorage.getItem(ID_COUNTER_KEY) || '0');
+            counter++;
+            localStorage.setItem(ID_COUNTER_KEY, counter.toString());
+            return counter;
+        }
+
+        // 7日後の日付を取得
+        function getDateAfter7Days(fromDate = new Date()) {
+            const date = new Date(fromDate);
+            date.setDate(date.getDate() + 7);
+            return date.toISOString().split('T')[0];
+        }
+
+        // 今日の日付を取得
+        function getTodayString() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        // 今週の範囲を取得（今日から7日後まで）
+        function isThisWeek(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            const weekLater = new Date();
+            weekLater.setDate(today.getDate() + 7);
+            
+            today.setHours(0, 0, 0, 0);
+            date.setHours(0, 0, 0, 0);
+            
+            return date >= today && date <= weekLater;
+        }
+
+        // 今日かどうか
+        function isToday(dateString) {
+            return dateString === getTodayString();
+        }
+
+        // ページ読み込み時の初期化
+        window.onload = function() {
+            // 訪問日に今日の日付を設定
+            document.getElementById('visitDate').valueAsDate = new Date();
+            // 次回訪問予定日に7日後を設定
+            document.getElementById('nextVisitDate').value = getDateAfter7Days();
+            
+            // 表示を更新
+            displayCustomers();
+        };
+
+        // タブ切り替え
+        function switchTab(tabName) {
+            // すべてのタブとコンテンツを非アクティブに
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 選択されたタブをアクティブに
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            // 表示を更新
+            displayCustomers();
+        }
+
+        // 顧客登録
+        function registerCustomer(event) {
+            event.preventDefault();
+            
+            const customer = {
+                id: getNextId(),
+                name: document.getElementById('customerName').value,
+                address: document.getElementById('customerAddress').value,
+                needs: document.getElementById('customerNeeds').value,
+                nextVisitDate: document.getElementById('nextVisitDate').value,
+                visitHistory: [
+                    {
+                        date: document.getElementById('visitDate').value,
+                        memo: document.getElementById('visitMemo').value
+                    }
+                ]
+            };
+            
+            const customers = getCustomers();
+            customers.push(customer);
+            saveCustomers(customers);
+            
+            alert('顧客を登録しました!');
+            document.getElementById('customerForm').reset();
+            document.getElementById('visitDate').valueAsDate = new Date();
+            document.getElementById('nextVisitDate').value = getDateAfter7Days();
+            
+            // ホーム画面に切り替え
+            switchTab('home');
+            displayCustomers();
+        }
+
+        // 顧客カードを生成
+        function createCustomerCard(customer) {
+            const isUrgent = isThisWeek(customer.nextVisitDate);
+            const isTodayVisit = isToday(customer.nextVisitDate);
+            
+            let badge = '';
+            if (isTodayVisit) {
+                badge = '<span class="badge today">今日</span>';
+            } else if (isUrgent) {
+                badge = '<span class="badge this-week">今週</span>';
+            }
+            
+            const lastVisit = customer.visitHistory[customer.visitHistory.length - 1];
+            
+            let historyHtml = '';
+            if (customer.visitHistory.length > 0) {
+                historyHtml = '<div class="visit-history"><strong>訪問履歴:</strong>';
+                customer.visitHistory.forEach(visit => {
+                    historyHtml += `<div class="visit-history-item">📅 ${visit.date} - ${visit.memo || '(メモなし)'}</div>`;
+                });
+                historyHtml += '</div>';
+            }
+            
+            return `
+                <div class="customer-card ${isUrgent ? 'urgent' : ''}">
+                    <h3>${customer.name} ${badge}</h3>
+                    <div class="customer-info">🏠 ${customer.address}</div>
+                    <div class="customer-info">💡 ニーズ: ${customer.needs || '未記入'}</div>
+                    <div class="customer-info">📅 次回訪問予定: ${customer.nextVisitDate || '未設定'}</div>
+                    ${historyHtml}
+                    <div class="customer-actions">
+                        <button class="secondary" onclick="addVisitRecord(${customer.id})">訪問記録を追加</button>
+                        <button class="delete-btn" onclick="deleteCustomer(${customer.id})">削除</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 顧客表示
+        function displayCustomers() {
+            const customers = getCustomers();
+            
+            // 今週訪問予定の顧客
+            const thisWeekCustomers = customers.filter(c => c.nextVisitDate && isThisWeek(c.nextVisitDate));
+            const thisWeekContainer = document.getElementById('thisWeekCustomers');
+            
+            if (thisWeekCustomers.length === 0) {
+                thisWeekContainer.innerHTML = '<div class="empty-state">今週訪問予定の顧客はいません</div>';
+            } else {
+                // 訪問予定日順にソート
+                thisWeekCustomers.sort((a, b) => new Date(a.nextVisitDate) - new Date(b.nextVisitDate));
+                thisWeekContainer.innerHTML = thisWeekCustomers.map(createCustomerCard).join('');
+            }
+            
+            // 全顧客（ホーム画面）
+            const allCustomersHomeContainer = document.getElementById('allCustomersHome');
+            if (customers.length === 0) {
+                allCustomersHomeContainer.innerHTML = '<div class="empty-state">登録されている顧客はいません</div>';
+            } else {
+                allCustomersHomeContainer.innerHTML = customers.map(createCustomerCard).join('');
+            }
+            
+            // 全顧客一覧タブ
+            const allCustomersListContainer = document.getElementById('allCustomersList');
+            if (customers.length === 0) {
+                allCustomersListContainer.innerHTML = '<div class="empty-state">登録されている顧客はいません</div>';
+            } else {
+                allCustomersListContainer.innerHTML = customers.map(createCustomerCard).join('');
+            }
+        }
+
+        // 訪問記録を追加
+        function addVisitRecord(customerId) {
+            const customers = getCustomers();
+            const customer = customers.find(c => c.id === customerId);
+            
+            if (!customer) {
+                alert('顧客が見つかりません');
+                return;
+            }
+            
+            const visitDate = prompt('訪問日を入力してください (YYYY-MM-DD形式):', getTodayString());
+            if (!visitDate) return;
+            
+            const memo = prompt('訪問メモを入力してください:', '');
+            
+            const nextVisitDefault = getDateAfter7Days(new Date(visitDate));
+            const nextVisitDate = prompt('次回訪問予定日を入力してください (YYYY-MM-DD形式):', nextVisitDefault);
+            
+            customer.visitHistory.push({
+                date: visitDate,
+                memo: memo
+            });
+            
+            if (nextVisitDate) {
+                customer.nextVisitDate = nextVisitDate;
+            }
+            
+            saveCustomers(customers);
+            displayCustomers();
+            alert('訪問記録を追加しました!');
+        }
+
+        // 顧客削除
+        function deleteCustomer(customerId) {
+            if (!confirm('本当にこの顧客を削除しますか?')) return;
+            
+            let customers = getCustomers();
+            customers = customers.filter(c => c.id !== customerId);
+            saveCustomers(customers);
+            displayCustomers();
+            alert('顧客を削除しました');
+        }
+
+        // Excel出力
+        function exportToExcel() {
+            const customers = getCustomers();
+            
+            if (customers.length === 0) {
+                alert('出力する顧客データがありません');
+                return;
+            }
+            
+            // Excelデータ用の配列を作成
+            const excelData = [];
+            
+            customers.forEach(customer => {
+                const lastVisit = customer.visitHistory[customer.visitHistory.length - 1];
+                excelData.push({
+                    'ID': customer.id,
+                    '顧客名': customer.name,
+                    '住所': customer.address,
+                    'ニーズ': customer.needs || '',
+                    '最終訪問日': lastVisit ? lastVisit.date : '',
+                    '次回訪問予定日': customer.nextVisitDate || '',
+                    '訪問回数': customer.visitHistory.length,
+                    '最新メモ': lastVisit ? lastVisit.memo : ''
+                });
+            });
+            
+            // ワークシートを作成
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            
+            // ワークブックを作成
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '顧客リスト');
+            
+            // ファイル名を生成（日付付き）
+            const today = new Date().toISOString().split('T')[0];
+            const filename = `顧客リスト_${today}.xlsx`;
+            
+            // ファイルをダウンロード
+            XLSX.writeFile(wb, filename);
+        }
+    </script>
+</body>
+</html>
