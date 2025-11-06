@@ -234,15 +234,12 @@
 
         <!-- ホーム画面 -->
         <div id="home" class="tab-content active">
-            <div class="button-group">
-                <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
-            </div>
-
-            <h2>📅 今週訪問予定の顧客</h2>
-            <div id="thisWeekCustomers" class="customer-list"></div>
-
             <h2>👥 全顧客</h2>
             <div id="allCustomersHome" class="customer-list"></div>
+
+            <div class="button-group" style="margin-top: 30px;">
+                <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
+            </div>
         </div>
 
         <!-- 新規顧客登録 -->
@@ -250,33 +247,86 @@
             <h2>新規顧客登録</h2>
             <form id="customerForm" onsubmit="registerCustomer(event)">
                 <div class="form-group">
-                    <label>顧客名 *</label>
-                    <input type="text" id="customerName" required placeholder="例: 田中様、〇〇マンション3階の方">
+                    <label>初回訪問日時</label>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                        <input type="date" id="visitDate" style="flex: 1;">
+                        <input type="time" id="visitTime" style="flex: 1;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" onclick="changeVisitDate(-1)" style="flex: 1;">前の日</button>
+                        <button type="button" onclick="changeVisitDate(1)" style="flex: 1;">次の日</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>住所 *</label>
-                    <input type="text" id="customerAddress" required placeholder="例: 〇〇町1-2-3">
+                    <label>顧客名</label>
+                    <input type="text" id="customerName" placeholder="例: 田中様、〇〇マンション3階の方">
+                </div>
+
+                <div class="form-group">
+                    <label>対面者</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="contact" value="奥"> 奥
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="contact" value="夫"> 夫
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="contact" value="おば"> おば
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="contact" value="おじ"> おじ
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="contact" value="子"> 子
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>住所</label>
+                    <input type="text" id="customerAddress" placeholder="例: 〇〇町1-2-3">
                 </div>
 
                 <div class="form-group">
                     <label>ニーズ</label>
-                    <input type="text" id="customerNeeds" placeholder="例: 便秘、下痢、睡眠">
-                </div>
-
-                <div class="form-group">
-                    <label>初回訪問日 *</label>
-                    <input type="date" id="visitDate" required>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="needs" value="便秘"> 便秘
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="needs" value="下痢"> 下痢
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="needs" value="睡眠"> 睡眠
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="needs" value="ストレス"> ストレス
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="needs" value="アレルギー"> アレルギー
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="needs" value="その他" id="needsOtherCheckbox" onchange="toggleOtherNeeds()"> その他
+                        </label>
+                    </div>
+                    <input type="text" id="needsOtherText" placeholder="その他のニーズを入力" style="margin-top: 10px; display: none;">
                 </div>
 
                 <div class="form-group">
                     <label>訪問メモ</label>
-                    <textarea id="visitMemo" placeholder="例: ヤクルト400を提案、興味あり"></textarea>
+                    <textarea id="visitMemo" placeholder="例:&#10;眼鏡をかけた背の高いおじいちゃん&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>次回訪問予定日</label>
-                    <input type="date" id="nextVisitDate">
+                    <input type="date" id="nextVisitDate" style="margin-bottom: 10px;">
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" onclick="changeNextVisitDate(-1)" style="flex: 1;">前の日</button>
+                        <button type="button" onclick="changeNextVisitDate(1)" style="flex: 1;">次の日</button>
+                        <button type="button" onclick="clearNextVisitDate()" style="flex: 1;">未設定</button>
+                    </div>
                 </div>
 
                 <button type="submit">登録する</button>
@@ -332,6 +382,37 @@
             return new Date().toISOString().split('T')[0];
         }
 
+        // 訪問日を変更（前の日/次の日ボタン用）
+        function changeVisitDate(days) {
+            const visitDateInput = document.getElementById('visitDate');
+            const currentDate = visitDateInput.value ? new Date(visitDateInput.value) : new Date();
+            currentDate.setDate(currentDate.getDate() + days);
+            visitDateInput.value = currentDate.toISOString().split('T')[0];
+        }
+
+        // 次回訪問予定日を変更（前の日/次の日ボタン用）
+        function changeNextVisitDate(days) {
+            const nextVisitDateInput = document.getElementById('nextVisitDate');
+            const currentDate = nextVisitDateInput.value ? new Date(nextVisitDateInput.value) : new Date();
+            currentDate.setDate(currentDate.getDate() + days);
+            nextVisitDateInput.value = currentDate.toISOString().split('T')[0];
+        }
+
+        // 次回訪問予定日をクリア（未設定ボタン用）
+        function clearNextVisitDate() {
+            document.getElementById('nextVisitDate').value = '';
+        }
+
+        // その他ニーズの入力欄表示切替
+        function toggleOtherNeeds() {
+            const checkbox = document.getElementById('needsOtherCheckbox');
+            const textInput = document.getElementById('needsOtherText');
+            textInput.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) {
+                textInput.value = '';
+            }
+        }
+
         // 今週の範囲を取得（今日から7日後まで）
         function isThisWeek(dateString) {
             const date = new Date(dateString);
@@ -354,6 +435,11 @@
         window.onload = function() {
             // 訪問日に今日の日付を設定
             document.getElementById('visitDate').valueAsDate = new Date();
+            // 訪問時刻に現在時刻を設定
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('visitTime').value = `${hours}:${minutes}`;
             // 次回訪問予定日に7日後を設定
             document.getElementById('nextVisitDate').value = getDateAfter7Days();
             
@@ -379,15 +465,37 @@
         function registerCustomer(event) {
             event.preventDefault();
             
+            // ニーズをチェックボックスから取得
+            const needsCheckboxes = document.querySelectorAll('input[name="needs"]:checked');
+            const needsArray = Array.from(needsCheckboxes).map(cb => cb.value);
+            
+            // その他が選択されていて、テキストが入力されている場合
+            const otherNeedsText = document.getElementById('needsOtherText').value.trim();
+            if (document.getElementById('needsOtherCheckbox').checked && otherNeedsText) {
+                needsArray[needsArray.indexOf('その他')] = `その他(${otherNeedsText})`;
+            }
+            
+            const needs = needsArray.join(', ');
+            
+            // 対面者をチェックボックスから取得
+            const contactCheckboxes = document.querySelectorAll('input[name="contact"]:checked');
+            const contacts = Array.from(contactCheckboxes).map(cb => cb.value).join(', ');
+            
+            // 訪問日時を結合
+            const visitDate = document.getElementById('visitDate').value;
+            const visitTime = document.getElementById('visitTime').value;
+            const visitDateTime = visitTime ? `${visitDate} ${visitTime}` : visitDate;
+            
             const customer = {
                 id: getNextId(),
-                name: document.getElementById('customerName').value,
-                address: document.getElementById('customerAddress').value,
-                needs: document.getElementById('customerNeeds').value,
+                name: document.getElementById('customerName').value || '(未入力)',
+                address: document.getElementById('customerAddress').value || '(未入力)',
+                contact: contacts || '(未入力)',
+                needs: needs || '(未入力)',
                 nextVisitDate: document.getElementById('nextVisitDate').value,
                 visitHistory: [
                     {
-                        date: document.getElementById('visitDate').value,
+                        date: visitDateTime,
                         memo: document.getElementById('visitMemo').value
                     }
                 ]
@@ -399,7 +507,13 @@
             
             alert('顧客を登録しました!');
             document.getElementById('customerForm').reset();
+            
+            // 初期値を再設定
             document.getElementById('visitDate').valueAsDate = new Date();
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('visitTime').value = `${hours}:${minutes}`;
             document.getElementById('nextVisitDate').value = getDateAfter7Days();
             
             // ホーム画面に切り替え
@@ -433,6 +547,7 @@
             return `
                 <div class="customer-card ${isUrgent ? 'urgent' : ''}">
                     <h3>${customer.name} ${badge}</h3>
+                    <div class="customer-info">👤 対面者: ${customer.contact || '(未入力)'}</div>
                     <div class="customer-info">🏠 ${customer.address}</div>
                     <div class="customer-info">💡 ニーズ: ${customer.needs || '未記入'}</div>
                     <div class="customer-info">📅 次回訪問予定: ${customer.nextVisitDate || '未設定'}</div>
@@ -448,18 +563,6 @@
         // 顧客表示
         function displayCustomers() {
             const customers = getCustomers();
-            
-            // 今週訪問予定の顧客
-            const thisWeekCustomers = customers.filter(c => c.nextVisitDate && isThisWeek(c.nextVisitDate));
-            const thisWeekContainer = document.getElementById('thisWeekCustomers');
-            
-            if (thisWeekCustomers.length === 0) {
-                thisWeekContainer.innerHTML = '<div class="empty-state">今週訪問予定の顧客はいません</div>';
-            } else {
-                // 訪問予定日順にソート
-                thisWeekCustomers.sort((a, b) => new Date(a.nextVisitDate) - new Date(b.nextVisitDate));
-                thisWeekContainer.innerHTML = thisWeekCustomers.map(createCustomerCard).join('');
-            }
             
             // 全顧客（ホーム画面）
             const allCustomersHomeContainer = document.getElementById('allCustomersHome');
@@ -538,9 +641,10 @@
                 excelData.push({
                     'ID': customer.id,
                     '顧客名': customer.name,
+                    '対面者': customer.contact || '',
                     '住所': customer.address,
                     'ニーズ': customer.needs || '',
-                    '最終訪問日': lastVisit ? lastVisit.date : '',
+                    '最終訪問日時': lastVisit ? lastVisit.date : '',
                     '次回訪問予定日': customer.nextVisitDate || '',
                     '訪問回数': customer.visitHistory.length,
                     '最新メモ': lastVisit ? lastVisit.memo : ''
