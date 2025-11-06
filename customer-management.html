@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>顧客管理アプリ</title>
+    <title>ひまわり活動</title>
     <style>
         * {
             margin: 0;
@@ -13,31 +13,51 @@
 
         body {
             font-family: 'Segoe UI', Meiryo, sans-serif;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #FFF8DC 0%, #FFEFD5 50%, #FFE4B5 100%);
+            background-attachment: fixed;
             padding: 20px;
             line-height: 1.6;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 200, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 230, 0, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .container {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0.95);
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(255, 193, 7, 0.2);
         }
 
         h1 {
-            color: #333;
+            color: #FF8C00;
             margin-bottom: 30px;
             font-size: 28px;
+            text-shadow: 1px 1px 2px rgba(255, 193, 7, 0.3);
         }
 
         h2 {
-            color: #555;
+            color: #FF8C00;
             margin: 30px 0 15px 0;
             font-size: 20px;
-            border-bottom: 2px solid #4CAF50;
+            border-bottom: 2px solid #FFB347;
             padding-bottom: 10px;
         }
 
@@ -63,7 +83,7 @@
         }
 
         .tab.active {
-            background-color: #4CAF50;
+            background-color: #FFB347;
             color: white;
         }
 
@@ -103,7 +123,7 @@
         }
 
         button {
-            background-color: #4CAF50;
+            background-color: #FFB347;
             color: white;
             padding: 12px 30px;
             border: none;
@@ -111,10 +131,11 @@
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #FF8C00;
         }
 
         button.secondary {
@@ -134,7 +155,7 @@
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 5px;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid #FFB347;
         }
 
         .customer-card.urgent {
@@ -238,15 +259,15 @@
         }
 
         .kana-btn.active {
-            background-color: #4CAF50;
+            background-color: #FFB347;
             color: white;
-            border-color: #4CAF50;
+            border-color: #FFB347;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏠 顧客管理アプリ</h1>
+        <h1>🌻 ひまわり活動</h1>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('register')">新規顧客登録</button>
@@ -329,16 +350,6 @@
                 <div class="form-group">
                     <label>訪問メモ</label>
                     <textarea id="visitMemo" placeholder="例:&#10;眼鏡をかけた背の高いおじいちゃん&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>次回訪問予定日</label>
-                    <input type="date" id="nextVisitDate" style="margin-bottom: 10px;">
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" onclick="changeNextVisitDate(-1)" style="flex: 1;">前の日</button>
-                        <button type="button" onclick="changeNextVisitDate(1)" style="flex: 1;">次の日</button>
-                        <button type="button" onclick="clearNextVisitDate()" style="flex: 1;">未設定</button>
-                    </div>
                 </div>
 
                 <button type="submit">登録する</button>
@@ -448,16 +459,6 @@
                     <input type="text" id="detailNeedsOtherText" placeholder="その他のニーズを入力" style="margin-top: 10px; display: none;">
                 </div>
 
-                <div class="form-group">
-                    <label>次回訪問予定日</label>
-                    <input type="date" id="detailNextVisitDate" style="margin-bottom: 10px;">
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" onclick="changeDetailNextVisitDate(-1)" style="flex: 1;">前の日</button>
-                        <button type="button" onclick="changeDetailNextVisitDate(1)" style="flex: 1;">次の日</button>
-                        <button type="button" onclick="clearDetailNextVisitDate()" style="flex: 1;">未設定</button>
-                    </div>
-                </div>
-
                 <h3 style="margin-top: 30px; margin-bottom: 15px;">訪問履歴</h3>
                 <div id="visitHistoryList" style="margin-bottom: 20px;"></div>
 
@@ -480,11 +481,12 @@
                     <textarea id="detailVisitMemo" placeholder="例:&#10;眼鏡をかけた背の高いおじいちゃん&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" style="flex: 1;">保存して一覧に戻る</button>
-                    <button type="button" onclick="deleteCustomerFromDetail()" class="delete-btn" style="flex: 1;">顧客を削除</button>
-                </div>
+                <button type="submit" style="width: 100%;">保存して一覧に戻る</button>
             </form>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd;">
+                <button onclick="deleteCustomerFromDetail()" class="delete-btn" style="width: 100%;">この顧客を削除</button>
+            </div>
         </div>
     </div>
 
@@ -515,13 +517,6 @@
             return counter;
         }
 
-        // 7日後の日付を取得
-        function getDateAfter7Days(fromDate = new Date()) {
-            const date = new Date(fromDate);
-            date.setDate(date.getDate() + 7);
-            return date.toISOString().split('T')[0];
-        }
-
         // 今日の日付を取得
         function getTodayString() {
             return new Date().toISOString().split('T')[0];
@@ -535,19 +530,6 @@
             visitDateInput.value = currentDate.toISOString().split('T')[0];
         }
 
-        // 次回訪問予定日を変更（前の日/次の日ボタン用）
-        function changeNextVisitDate(days) {
-            const nextVisitDateInput = document.getElementById('nextVisitDate');
-            const currentDate = nextVisitDateInput.value ? new Date(nextVisitDateInput.value) : new Date();
-            currentDate.setDate(currentDate.getDate() + days);
-            nextVisitDateInput.value = currentDate.toISOString().split('T')[0];
-        }
-
-        // 次回訪問予定日をクリア（未設定ボタン用）
-        function clearNextVisitDate() {
-            document.getElementById('nextVisitDate').value = '';
-        }
-
         // その他ニーズの入力欄表示切替
         function toggleOtherNeeds() {
             const checkbox = document.getElementById('needsOtherCheckbox');
@@ -556,24 +538,6 @@
             if (!checkbox.checked) {
                 textInput.value = '';
             }
-        }
-
-        // 今週の範囲を取得（今日から7日後まで）
-        function isThisWeek(dateString) {
-            const date = new Date(dateString);
-            const today = new Date();
-            const weekLater = new Date();
-            weekLater.setDate(today.getDate() + 7);
-            
-            today.setHours(0, 0, 0, 0);
-            date.setHours(0, 0, 0, 0);
-            
-            return date >= today && date <= weekLater;
-        }
-
-        // 今日かどうか
-        function isToday(dateString) {
-            return dateString === getTodayString();
         }
 
         // ページ読み込み時の初期化
@@ -585,8 +549,6 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             document.getElementById('visitTime').value = `${hours}:${minutes}`;
-            // 次回訪問予定日に7日後を設定
-            document.getElementById('nextVisitDate').value = getDateAfter7Days();
             
             // 表示を更新
             displayCustomers();
@@ -637,7 +599,6 @@
                 address: document.getElementById('customerAddress').value || '(未入力)',
                 contact: contacts || '(未入力)',
                 needs: needs || '(未入力)',
-                nextVisitDate: document.getElementById('nextVisitDate').value,
                 visitHistory: [
                     {
                         date: visitDateTime,
@@ -659,7 +620,6 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             document.getElementById('visitTime').value = `${hours}:${minutes}`;
-            document.getElementById('nextVisitDate').value = getDateAfter7Days();
             
             // 新規顧客登録画面のまま（遷移しない）
             displayCustomers();
@@ -672,7 +632,6 @@
                     <h3>${customer.name}</h3>
                     <div class="customer-actions">
                         <button class="secondary" onclick="showCustomerDetail(${customer.id})">情報確認・訪問記録を追加</button>
-                        <button class="delete-btn" onclick="deleteCustomer(${customer.id})">削除</button>
                     </div>
                 </div>
             `;
@@ -716,7 +675,6 @@
             document.getElementById('detailCustomerId').value = customer.id;
             document.getElementById('detailCustomerName').value = customer.name === '(未入力)' ? '' : customer.name;
             document.getElementById('detailCustomerAddress').value = customer.address === '(未入力)' ? '' : customer.address;
-            document.getElementById('detailNextVisitDate').value = customer.nextVisitDate || '';
             
             // 対面者のチェックボックスを設定
             document.querySelectorAll('input[name="detailContact"]').forEach(cb => {
@@ -772,7 +730,14 @@
             
             // 詳細画面に切り替え
             document.getElementById('detailTab').style.display = 'block';
-            switchTab('detail');
+            
+            // タブのアクティブ状態を手動で設定
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('detailTab').classList.add('active');
+            
+            // コンテンツの表示切り替え
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('detail').classList.add('active');
         }
 
         // 顧客一覧に戻る
@@ -797,7 +762,6 @@
             // 基本情報を更新
             customer.name = document.getElementById('detailCustomerName').value || '(未入力)';
             customer.address = document.getElementById('detailCustomerAddress').value || '(未入力)';
-            customer.nextVisitDate = document.getElementById('detailNextVisitDate').value;
             
             // 対面者を更新
             const contactCheckboxes = document.querySelectorAll('input[name="detailContact"]:checked');
@@ -831,19 +795,6 @@
             displayCustomers();
         }
 
-        // 詳細画面で次回訪問予定日を変更
-        function changeDetailNextVisitDate(days) {
-            const nextVisitDateInput = document.getElementById('detailNextVisitDate');
-            const currentDate = nextVisitDateInput.value ? new Date(nextVisitDateInput.value) : new Date();
-            currentDate.setDate(currentDate.getDate() + days);
-            nextVisitDateInput.value = currentDate.toISOString().split('T')[0];
-        }
-
-        // 詳細画面で次回訪問予定日をクリア
-        function clearDetailNextVisitDate() {
-            document.getElementById('detailNextVisitDate').value = '';
-        }
-
         // 詳細画面で訪問日を変更
         function changeDetailVisitDate(days) {
             const visitDateInput = document.getElementById('detailVisitDate');
@@ -873,17 +824,6 @@
             alert('顧客を削除しました');
             backToList();
             displayCustomers();
-        }
-
-        // 顧客削除
-        function deleteCustomer(customerId) {
-            if (!confirm('本当にこの顧客を削除しますか?')) return;
-            
-            let customers = getCustomers();
-            customers = customers.filter(c => c.id !== customerId);
-            saveCustomers(customers);
-            displayCustomers();
-            alert('顧客を削除しました');
         }
 
         // 50音フィルター
@@ -973,7 +913,6 @@
                     '住所': customer.address,
                     'ニーズ': customer.needs || '',
                     '最終訪問日時': lastVisit ? lastVisit.date : '',
-                    '次回訪問予定日': customer.nextVisitDate || '',
                     '訪問回数': customer.visitHistory.length,
                     '最新メモ': lastVisit ? lastVisit.memo : ''
                 });
