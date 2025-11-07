@@ -16,7 +16,8 @@
             background: linear-gradient(135deg, #FFF8DC 0%, #FFEFD5 50%, #FFE4B5 100%);
             background-attachment: fixed;
             padding: 20px;
-            line-height: 1.6;
+            line-height: 1.8;
+            font-size: 16px;
             position: relative;
         }
 
@@ -28,9 +29,9 @@
             width: 100%;
             height: 100%;
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 200, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 60%, rgba(255, 230, 0, 0.08) 0%, transparent 40%);
+                radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 200, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 230, 0, 0.12) 0%, transparent 40%);
             pointer-events: none;
             z-index: 0;
         }
@@ -40,25 +41,27 @@
             z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: rgba(255, 255, 255, 0.97);
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(255, 193, 7, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 6px 30px rgba(255, 193, 7, 0.25);
         }
 
         h1 {
-            color: #FF8C00;
+            color: #F57C00;
             margin-bottom: 30px;
-            font-size: 28px;
-            text-shadow: 1px 1px 2px rgba(255, 193, 7, 0.3);
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(255, 193, 7, 0.4);
         }
 
         h2 {
-            color: #FF8C00;
-            margin: 30px 0 15px 0;
-            font-size: 20px;
-            border-bottom: 2px solid #FFB347;
-            padding-bottom: 10px;
+            color: #F57C00;
+            margin: 30px 0 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 3px solid #FFA726;
+            padding-bottom: 12px;
         }
 
         .tabs {
@@ -69,22 +72,26 @@
         }
 
         .tab {
-            padding: 12px 24px;
+            padding: 16px 28px;
             background-color: #f0f0f0;
             border: none;
             cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px 5px 0 0;
-            transition: background-color 0.3s;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+            min-height: 55px;
         }
 
         .tab:hover {
-            background-color: #e0e0e0;
+            background-color: #FFE082;
+            transform: translateY(-2px);
         }
 
         .tab.active {
-            background-color: #FFB347;
+            background-color: #FFA726;
             color: white;
+            box-shadow: 0 4px 8px rgba(255, 167, 38, 0.3);
         }
 
         .tab-content {
@@ -96,54 +103,78 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #555;
             font-weight: bold;
+            font-size: 17px;
         }
 
         input[type="text"],
         input[type="date"],
+        input[type="time"],
         textarea,
         select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #FFA726;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 167, 38, 0.1);
         }
 
         textarea {
-            min-height: 80px;
+            min-height: 120px;
             resize: vertical;
         }
 
         button {
-            background-color: #FFB347;
+            background-color: #FFA726;
             color: white;
-            padding: 12px 30px;
+            padding: 16px 32px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            min-height: 52px;
+            box-shadow: 0 3px 6px rgba(255, 167, 38, 0.3);
         }
 
         button:hover {
-            background-color: #FF8C00;
+            background-color: #FB8C00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(255, 167, 38, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         button.secondary {
-            background-color: #2196F3;
+            background-color: #29B6F6;
+            box-shadow: 0 3px 6px rgba(41, 182, 246, 0.3);
         }
 
         button.secondary:hover {
-            background-color: #0b7dda;
+            background-color: #039BE5;
+            box-shadow: 0 5px 12px rgba(41, 182, 246, 0.4);
         }
 
         .customer-list {
@@ -151,11 +182,18 @@
         }
 
         .customer-card {
-            background-color: #f9f9f9;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #FFB347;
+            background-color: #FFFBF5;
+            padding: 20px;
+            margin-bottom: 18px;
+            border-radius: 10px;
+            border-left: 5px solid #FFA726;
+            box-shadow: 0 2px 8px rgba(255, 167, 38, 0.15);
+            transition: all 0.3s;
+        }
+
+        .customer-card:hover {
+            box-shadow: 0 4px 12px rgba(255, 167, 38, 0.25);
+            transform: translateX(3px);
         }
 
         .customer-card.urgent {
@@ -165,14 +203,15 @@
 
         .customer-card h3 {
             color: #333;
-            margin-bottom: 10px;
-            font-size: 18px;
+            margin-bottom: 12px;
+            font-size: 20px;
+            font-weight: bold;
         }
 
         .customer-info {
             color: #666;
-            font-size: 14px;
-            margin-bottom: 5px;
+            font-size: 16px;
+            margin-bottom: 8px;
         }
 
         .customer-actions {
@@ -243,25 +282,52 @@
         }
 
         .kana-btn {
-            padding: 8px 16px;
-            background-color: #f0f0f0;
-            color: #333;
-            border: 2px solid #ddd;
-            border-radius: 5px;
+            padding: 12px 20px;
+            background-color: #FFF9E6;
+            color: #F57C00;
+            border: 2px solid #FFD54F;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: bold;
             transition: all 0.3s;
-            min-width: 50px;
+            min-width: 60px;
+            min-height: 48px;
         }
 
         .kana-btn:hover {
-            background-color: #e0e0e0;
+            background-color: #FFE082;
+            border-color: #FFA726;
+            transform: translateY(-2px);
         }
 
         .kana-btn.active {
-            background-color: #FFB347;
+            background-color: #FFA726;
             color: white;
-            border-color: #FFB347;
+            border-color: #FFA726;
+            box-shadow: 0 3px 8px rgba(255, 167, 38, 0.3);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
         }
     </style>
 </head>
@@ -280,10 +346,91 @@
             <h2>新規顧客登録</h2>
             <form id="customerForm" onsubmit="registerCustomer(event)">
                 <div class="form-group">
-                    <label>初回訪問日時</label>
+                    <label>👤 顧客名</label>
+                    <input type="text" id="customerName" placeholder="例: 田中様、〇〇マンション3階の方">
+                </div>
+
+                <div class="form-group">
+                    <label>👥 対面者</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="contact" value="奥" style="width: 20px; height: 20px;"> 奥
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="contact" value="夫" style="width: 20px; height: 20px;"> 夫
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="contact" value="おば" style="width: 20px; height: 20px;"> おば
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="contact" value="おじ" style="width: 20px; height: 20px;"> おじ
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="contact" value="子" style="width: 20px; height: 20px;"> 子
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>🏠 住所</label>
+                    <input type="text" id="customerAddress" placeholder="例: 〇〇町1-2-3">
+                </div>
+
+                <div class="form-group">
+                    <label>💡 ニーズ</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="needs" value="便秘" style="width: 20px; height: 20px;"> 便秘
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="needs" value="下痢" style="width: 20px; height: 20px;"> 下痢
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="needs" value="睡眠" style="width: 20px; height: 20px;"> 睡眠
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="needs" value="ストレス" style="width: 20px; height: 20px;"> ストレス
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="needs" value="アレルギー" style="width: 20px; height: 20px;"> アレルギー
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="needs" value="その他" id="needsOtherCheckbox" onchange="toggleOtherNeeds()" style="width: 20px; height: 20px;"> その他
+                        </label>
+                    </div>
+                    <input type="text" id="needsOtherText" placeholder="その他のニーズを入力" style="margin-top: 10px; display: none;">
+                </div>
+
+                <div class="form-group">
+                    <label>📝 訪問メモ</label>
+                    <textarea id="visitMemo" placeholder="例： 見た目や雰囲気について&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>📅 初回訪問日時</label>
                     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
                         <input type="date" id="visitDate" style="flex: 1;">
-                        <input type="time" id="visitTime" style="flex: 1;">
+                        <select id="visitTime" style="flex: 1;">
+                            <option value="09:00">09:00</option>
+                            <option value="09:30">09:30</option>
+                            <option value="10:00">10:00</option>
+                            <option value="10:30">10:30</option>
+                            <option value="11:00">11:00</option>
+                            <option value="11:30">11:30</option>
+                            <option value="12:00">12:00</option>
+                            <option value="12:30">12:30</option>
+                            <option value="13:00">13:00</option>
+                            <option value="13:30">13:30</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:30">14:30</option>
+                            <option value="15:00">15:00</option>
+                            <option value="15:30">15:30</option>
+                            <option value="16:00">16:00</option>
+                            <option value="16:30">16:30</option>
+                            <option value="17:00">17:00</option>
+                            <option value="17:30">17:30</option>
+                            <option value="18:00">18:00</option>
+                        </select>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <button type="button" onclick="changeVisitDate(-1)" style="flex: 1;">前の日</button>
@@ -291,68 +438,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>顧客名</label>
-                    <input type="text" id="customerName" placeholder="例: 田中様、〇〇マンション3階の方">
-                </div>
-
-                <div class="form-group">
-                    <label>対面者</label>
-                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="contact" value="奥"> 奥
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="contact" value="夫"> 夫
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="contact" value="おば"> おば
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="contact" value="おじ"> おじ
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="contact" value="子"> 子
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>住所</label>
-                    <input type="text" id="customerAddress" placeholder="例: 〇〇町1-2-3">
-                </div>
-
-                <div class="form-group">
-                    <label>ニーズ</label>
-                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="needs" value="便秘"> 便秘
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="needs" value="下痢"> 下痢
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="needs" value="睡眠"> 睡眠
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="needs" value="ストレス"> ストレス
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="needs" value="アレルギー"> アレルギー
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
-                            <input type="checkbox" name="needs" value="その他" id="needsOtherCheckbox" onchange="toggleOtherNeeds()"> その他
-                        </label>
-                    </div>
-                    <input type="text" id="needsOtherText" placeholder="その他のニーズを入力" style="margin-top: 10px; display: none;">
-                </div>
-
-                <div class="form-group">
-                    <label>訪問メモ</label>
-                    <textarea id="visitMemo" placeholder="例： 見た目や雰囲気について&#10;400Wを提案、興味あり&#10;こんな話をした"></textarea>
-                </div>
-
-                <button type="submit">登録する</button>
+                <button type="submit">✅ 登録する</button>
             </form>
         </div>
 
@@ -407,7 +493,9 @@
             
             <div class="button-group" style="margin-top: 30px;">
                 <button class="secondary" onclick="exportToExcel()">📊 Excelに出力</button>
+                <button class="secondary" onclick="document.getElementById('importFile').click()" style="background-color: #2196F3;">📥 Excelから復元</button>
             </div>
+            <input type="file" id="importFile" accept=".xlsx" style="display: none;" onchange="importFromExcel(event)">
 
             <!-- デバッグ用: 全データ削除ボタン -->
             <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center;">
@@ -545,6 +633,45 @@
             return new Date().toISOString().split('T')[0];
         }
 
+        // 成功メッセージを表示（3秒後に消える）
+        function showSuccessMessage(message) {
+            // 既存のメッセージがあれば削除
+            const existingMsg = document.getElementById('successMessage');
+            if (existingMsg) {
+                existingMsg.remove();
+            }
+            
+            // メッセージを作成
+            const messageDiv = document.createElement('div');
+            messageDiv.id = 'successMessage';
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #4CAF50;
+                color: white;
+                padding: 16px 32px;
+                border-radius: 8px;
+                font-size: 18px;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                z-index: 10000;
+                animation: slideDown 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(messageDiv);
+            
+            // 3秒後に消す
+            setTimeout(() => {
+                messageDiv.style.animation = 'slideUp 0.3s ease-out';
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 300);
+            }, 3000);
+        }
+
         // 訪問日を変更（前の日/次の日ボタン用）
         function changeVisitDate(days) {
             const visitDateInput = document.getElementById('visitDate');
@@ -567,11 +694,21 @@
         window.onload = function() {
             // 訪問日に今日の日付を設定
             document.getElementById('visitDate').valueAsDate = new Date();
-            // 訪問時刻に現在時刻を設定
+            
+            // 訪問時刻に現在時刻の30分刻みを設定
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('visitTime').value = `${hours}:${minutes}`;
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            
+            // 30分刻みに丸める
+            let roundedMinutes = minutes < 30 ? '00' : '30';
+            let timeValue = `${String(hours).padStart(2, '0')}:${roundedMinutes}`;
+            
+            // セレクトボックスに値を設定
+            const timeSelect = document.getElementById('visitTime');
+            if (timeSelect) {
+                timeSelect.value = timeValue;
+            }
             
             // バックアップリマインダーをチェック
             checkBackupReminder();
@@ -637,18 +774,23 @@
             customers.push(customer);
             saveCustomers(customers);
             
-            alert('顧客を登録しました!');
+            // alertを削除してスムーズに
             document.getElementById('customerForm').reset();
             
             // 初期値を再設定
             document.getElementById('visitDate').valueAsDate = new Date();
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('visitTime').value = `${hours}:${minutes}`;
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            let roundedMinutes = minutes < 30 ? '00' : '30';
+            let timeValue = `${String(hours).padStart(2, '0')}:${roundedMinutes}`;
+            document.getElementById('visitTime').value = timeValue;
             
             // 新規顧客登録画面のまま（遷移しない）
             displayCustomers();
+            
+            // 画面上部に小さな成功メッセージを表示（3秒後に消える）
+            showSuccessMessage('✅ 登録しました');
         }
 
         // 顧客カードを生成
@@ -842,7 +984,7 @@
             }
             
             saveCustomers(customers);
-            alert('顧客情報を更新しました!');
+            showSuccessMessage('✅ 更新しました');
             backToList();
             displayCustomers();
         }
@@ -936,7 +1078,7 @@
             
             saveCustomers(customers);
             closeEditDialog();
-            alert('訪問履歴を更新しました!');
+            showSuccessMessage('✅ 訪問履歴を更新しました');
             
             // 詳細画面を再表示
             showCustomerDetail(customerId);
@@ -1191,6 +1333,131 @@
                 reminderDiv.style.display = 'none';
             }
             localStorage.removeItem(BACKUP_REMINDER_DISMISSED_KEY);
+        }
+
+        // Excelファイルからデータをインポート（復元）
+        function importFromExcel(event) {
+            const file = event.target.files[0];
+            
+            if (!file) {
+                return;
+            }
+            
+            // ファイル名チェック（このアプリで出力したファイルかどうか）
+            if (!file.name.startsWith('顧客リスト_') && !file.name.includes('.xlsx')) {
+                alert('このアプリで出力したExcelファイルを選択してください。\nファイル名: 顧客リスト_YYYY-MM-DD.xlsx');
+                event.target.value = '';
+                return;
+            }
+            
+            // 3回確認
+            if (!confirm('【警告1/3】Excelファイルからデータを復元します。\n\n現在のデータは全て削除されます。\n本当によろしいですか？')) {
+                event.target.value = '';
+                return;
+            }
+            
+            if (!confirm('【警告2/3】現在登録されている全てのデータが削除され、\nExcelファイルの内容に置き換えられます。\n\n続けますか？')) {
+                event.target.value = '';
+                return;
+            }
+            
+            if (!confirm('【最終確認3/3】これが最後の確認です。\n\nExcelファイルからデータを復元し、現在のデータを削除しますか？')) {
+                event.target.value = '';
+                return;
+            }
+            
+            // ファイルを読み込む
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // 最初のシート（顧客リスト）を読み込む
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    if (jsonData.length === 0) {
+                        alert('Excelファイルにデータがありません。');
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    // データを変換
+                    const customers = [];
+                    let maxId = 0;
+                    
+                    jsonData.forEach(row => {
+                        // IDを取得
+                        const id = row['ID'] || row['id'];
+                        if (!id) return; // IDがない行はスキップ
+                        
+                        if (id > maxId) maxId = id;
+                        
+                        // 顧客データを構築
+                        const customer = {
+                            id: id,
+                            name: row['顧客名'] || '(未入力)',
+                            contact: row['対面者'] || '(未入力)',
+                            address: row['住所'] || '(未入力)',
+                            needs: row['ニーズ'] || '(未入力)',
+                            visitHistory: []
+                        };
+                        
+                        // 訪問履歴を構築（最低1件は必要）
+                        const lastVisitDate = row['最終訪問日時'] || row['最終訪問日'];
+                        const lastMemo = row['最新メモ'] || '';
+                        
+                        if (lastVisitDate) {
+                            customer.visitHistory.push({
+                                date: lastVisitDate,
+                                memo: lastMemo
+                            });
+                        }
+                        
+                        customers.push(customer);
+                    });
+                    
+                    if (customers.length === 0) {
+                        alert('有効なデータが見つかりませんでした。');
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    // 既存データを削除
+                    localStorage.removeItem(STORAGE_KEY);
+                    
+                    // 新しいデータを保存
+                    saveCustomers(customers);
+                    
+                    // IDカウンターを更新
+                    localStorage.setItem(ID_COUNTER_KEY, maxId.toString());
+                    
+                    // バックアップ日時を更新
+                    localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+                    
+                    alert(`データを復元しました！\n${customers.length}件の顧客データを読み込みました。`);
+                    
+                    // 画面を更新
+                    displayCustomers();
+                    
+                } catch (error) {
+                    console.error('インポートエラー:', error);
+                    alert('Excelファイルの読み込みに失敗しました。\n\nこのアプリで出力したファイルを選択してください。');
+                } finally {
+                    // ファイル選択をリセット
+                    event.target.value = '';
+                }
+            };
+            
+            reader.onerror = function() {
+                alert('ファイルの読み込みに失敗しました。');
+                event.target.value = '';
+            };
+            
+            reader.readAsArrayBuffer(file);
         }
     </script>
 </body>
