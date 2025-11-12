@@ -724,7 +724,18 @@
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
             // 選択されたタブをアクティブに
-            event.target.classList.add('active');
+            // タブ名に対応するボタンを見つける
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach((tab, index) => {
+                if (index === 0 && tabName === 'register') {
+                    tab.classList.add('active');
+                } else if (index === 1 && tabName === 'list') {
+                    tab.classList.add('active');
+                } else if (index === 2 && tabName === 'detail') {
+                    tab.classList.add('active');
+                }
+            });
+            
             document.getElementById(tabName).classList.add('active');
             
             // 表示を更新
