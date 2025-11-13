@@ -543,6 +543,12 @@
                         <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
                             <input type="checkbox" name="detailContact" value="子"> 子
                         </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal;">
+                            <input type="checkbox" name="detailContact" value="その他" id="detailContactOtherCheckbox" onchange="toggleDetailOtherContact()"> その他
+                        </label>
+                    </div>
+                    <div id="detailContactOtherTextDiv" style="display: none; margin-top: 10px;">
+                        <input type="text" id="detailContactOtherText" placeholder="その他の対面者を入力してください" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #FFA726; border-radius: 5px;">
                     </div>
                 </div>
 
@@ -708,6 +714,16 @@
             }
         }
 
+        // 顧客詳細の対面者「その他」チェックボックスの表示切り替え
+        function toggleDetailOtherContact() {
+            const checkbox = document.getElementById('detailContactOtherCheckbox');
+            const textDiv = document.getElementById('detailContactOtherTextDiv');
+            textDiv.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) {
+                document.getElementById('detailContactOtherText').value = '';
+            }
+        }
+
         // ページ読み込み時の初期化
         window.onload = function() {
             // 訪問日に今日の日付を設定
@@ -797,8 +813,10 @@
             
             document.getElementById(tabName).classList.add('active');
             
-            // 表示を更新
-            displayCustomers();
+            // 顧客一覧タブの場合、フィルターを適用して表示を更新
+            if (tabName === 'list') {
+                applyFilters();
+            }
         }
 
         // 顧客登録
@@ -945,9 +963,26 @@
             document.getElementById('detailCustomerAddress').value = customer.address === '(未入力)' ? '' : customer.address;
             
             // 対面者のチェックボックスを設定
-            document.querySelectorAll('input[name="detailContact"]').forEach(cb => {
-                cb.checked = customer.contact && customer.contact.includes(cb.value);
-            });
+            document.querySelectorAll('input[name="detailContact"]').forEach(cb => cb.checked = false);
+            document.getElementById('detailContactOtherTextDiv').style.display = 'none';
+            document.getElementById('detailContactOtherText').value = '';
+            
+            if (customer.contact && customer.contact !== '(未入力)') {
+                const contactArray = customer.contact.split(', ');
+                contactArray.forEach(contact => {
+                    if (contact.startsWith('その他(')) {
+                        document.getElementById('detailContactOtherCheckbox').checked = true;
+                        document.getElementById('detailContactOtherTextDiv').style.display = 'block';
+                        const otherText = contact.match(/その他\((.*)\)/);
+                        if (otherText) {
+                            document.getElementById('detailContactOtherText').value = otherText[1];
+                        }
+                    } else {
+                        const checkbox = Array.from(document.querySelectorAll('input[name="detailContact"]')).find(cb => cb.value === contact);
+                        if (checkbox) checkbox.checked = true;
+                    }
+                });
+            }
             
             // ニーズのチェックボックスを設定
             document.querySelectorAll('input[name="detailNeeds"]').forEach(cb => cb.checked = false);
@@ -1037,7 +1072,15 @@
             
             // 対面者を更新
             const contactCheckboxes = document.querySelectorAll('input[name="detailContact"]:checked');
-            customer.contact = Array.from(contactCheckboxes).map(cb => cb.value).join(', ') || '(未入力)';
+            const contactArray = Array.from(contactCheckboxes).map(cb => cb.value);
+            
+            // その他が選択されていて、テキストが入力されている場合
+            const otherContactText = document.getElementById('detailContactOtherText').value.trim();
+            if (document.getElementById('detailContactOtherCheckbox').checked && otherContactText) {
+                contactArray[contactArray.indexOf('その他')] = `その他(${otherContactText})`;
+            }
+            
+            customer.contact = contactArray.join(', ') || '(未入力)';
             
             // ニーズを更新
             const needsCheckboxes = document.querySelectorAll('input[name="detailNeeds"]:checked');
