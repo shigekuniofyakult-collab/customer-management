@@ -368,6 +368,12 @@
                         <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
                             <input type="checkbox" name="contact" value="子" style="width: 20px; height: 20px;"> 子
                         </label>
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 16px;">
+                            <input type="checkbox" name="contact" value="その他" id="contactOtherCheckbox" onchange="toggleOtherContact()" style="width: 20px; height: 20px;"> その他
+                        </label>
+                    </div>
+                    <div id="contactOtherTextDiv" style="display: none; margin-top: 10px;">
+                        <input type="text" id="contactOtherText" placeholder="その他の対面者を入力してください" style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #FFA726; border-radius: 5px;">
                     </div>
                 </div>
 
@@ -579,7 +585,9 @@
                     <label>訪問日時</label>
                     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
                         <input type="date" id="detailVisitDate" style="flex: 1;">
-                        <input type="time" id="detailVisitTime" style="flex: 1;">
+                        <select id="detailVisitTime" style="flex: 1; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 5px;">
+                            <!-- 9:00 から 18:00 まで30分刻み -->
+                        </select>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <button type="button" onclick="changeDetailVisitDate(-1)" style="flex: 1;">前の日</button>
@@ -690,6 +698,16 @@
             }
         }
 
+        // 対面者の「その他」チェックボックスの表示切り替え
+        function toggleOtherContact() {
+            const checkbox = document.getElementById('contactOtherCheckbox');
+            const textDiv = document.getElementById('contactOtherTextDiv');
+            textDiv.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) {
+                document.getElementById('contactOtherText').value = '';
+            }
+        }
+
         // ページ読み込み時の初期化
         window.onload = function() {
             // 訪問日に今日の日付を設定
@@ -710,12 +728,53 @@
                 timeSelect.value = timeValue;
             }
             
+            // 顧客詳細の訪問時刻selectボックスを初期化
+            initDetailVisitTimeSelect();
+            
             // バックアップリマインダーをチェック
             checkBackupReminder();
             
             // 表示を更新
             displayCustomers();
         };
+
+        // 顧客詳細の訪問時刻selectボックスを初期化
+        function initDetailVisitTimeSelect() {
+            const detailTimeSelect = document.getElementById('detailVisitTime');
+            if (!detailTimeSelect) return;
+            
+            // 既にオプションがある場合はクリア
+            detailTimeSelect.innerHTML = '';
+            
+            // 9:00から18:00まで30分刻みでオプションを追加
+            for (let hour = 9; hour <= 18; hour++) {
+                for (let minute of ['00', '30']) {
+                    if (hour === 18 && minute === '30') break; // 18:30は含めない
+                    
+                    const timeStr = `${String(hour).padStart(2, '0')}:${minute}`;
+                    const option = document.createElement('option');
+                    option.value = timeStr;
+                    option.textContent = timeStr;
+                    detailTimeSelect.appendChild(option);
+                }
+            }
+            
+            // 現在時刻を30分単位で丸めて初期値に設定
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const roundedMinute = currentMinute < 30 ? '00' : '30';
+            const currentTime = `${String(currentHour).padStart(2, '0')}:${roundedMinute}`;
+            
+            // 範囲内の場合のみ設定
+            if (currentHour >= 9 && currentHour <= 18) {
+                detailTimeSelect.value = currentTime;
+            } else if (currentHour < 9) {
+                detailTimeSelect.value = '09:00';
+            } else {
+                detailTimeSelect.value = '18:00';
+            }
+        }
 
         // タブ切り替え
         function switchTab(tabName) {
@@ -760,7 +819,15 @@
             
             // 対面者をチェックボックスから取得
             const contactCheckboxes = document.querySelectorAll('input[name="contact"]:checked');
-            const contacts = Array.from(contactCheckboxes).map(cb => cb.value).join(', ');
+            const contactArray = Array.from(contactCheckboxes).map(cb => cb.value);
+            
+            // その他が選択されていて、テキストが入力されている場合
+            const otherContactText = document.getElementById('contactOtherText').value.trim();
+            if (document.getElementById('contactOtherCheckbox').checked && otherContactText) {
+                contactArray[contactArray.indexOf('その他')] = `その他(${otherContactText})`;
+            }
+            
+            const contacts = contactArray.join(', ');
             
             // 訪問日時を結合
             const visitDate = document.getElementById('visitDate').value;
@@ -929,10 +996,10 @@
             
             // 新しい訪問記録の初期値を設定
             document.getElementById('detailVisitDate').valueAsDate = new Date();
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('detailVisitTime').value = `${hours}:${minutes}`;
+            
+            // 時刻selectを初期化
+            initDetailVisitTimeSelect();
+            
             document.getElementById('detailVisitMemo').value = '';
             
             // 詳細画面に切り替え
